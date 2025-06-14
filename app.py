@@ -2,6 +2,7 @@ from flask import Flask, render_template           # importing render template c
 from flask_socketio import SocketIO, send          # impoting send function  so that whavtever text im writing must be visiable to the other client
 from pymongo import MongoClient                    # to connect and interact with MongoDB Atlas
 from nltk.sentiment import SentimentIntensityAnalyzer  # sentiment analysis using VADER
+import nltk
 from datetime import datetime                      # to store message timestamps
 from dotenv import load_dotenv
 import os
@@ -10,6 +11,7 @@ import os
 app = Flask(__name__)   
 app.config["SECRET_KEY"] = "secretekey"            # Used to secure the session       WE can write anything i have written(secretekey)                   
 socketio = SocketIO(app)
+nltk.data.path.append('/opt/render/nltk_data') 
 sia = SentimentIntensityAnalyzer()                 # We are creating an object sia and assign SentimentIntensityAnalyzer() to it 
 
 # MongoDB Atlas connection (replace <password> with your actual MongoDB user password)
