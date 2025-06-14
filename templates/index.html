@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">    
+<head>
+    <title>Chat App</title> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>   <!--Referencing it to the SocketIo.js  Which is very Impotant cuz it loads the Socket.IO library so that we can talk to the backend --> 
+
+    <style>
+        #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }  
+        #message { width: 70%; padding: 5px; }
+        #send-btn { padding: 5px 10px; }
+        #mood-box {margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #444; }
+    </style>
+</head>
+<body>
+    <h2>Real-time Chat</h2>
+    <div id="mood-box">🙂 Mood: Neutral</div> <!--NEW mood display section -->
+    <div id="chat-box"></div>
+    <input type="text" id="message" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
+
+    <script>
+        const socket = io();      // Establishing Connection to the server  using Sockete.io
+
+        // Creationg a Listner Function 
+        socket.on('message' , function(msg) {                      // Giving Event Name "message" and data as Function(msg)
+            const Box = document.getElementById("chat-box");       // Finding ('Chat box') by id and stroing it in tp variable Box    --------------  so that we can add new meaasges in the Box 
+            const [mood, userMsg] = msg.split("\n");               // Split the incoming message into mood and actual message  Split at \n
+            Box.innerHTML += `<div>${msg}</div>`;                  // innnerHTML means Inside the chat box   So basically this line add new meaage in side the chat box  and writing the (msg) between <div> so it appears on New Line 
+            Box.scrollTop = Box.scrollHeight;                      // scrollTop shows how far down the box is scrolled and scrollHeight shows total height of the messages  bascaaly this line Automatically scroll the chat box to the bottom, so the latest message is visible.
+        });
+         // Handle mood update separately
+
+        socket.on("mood_update", function(mood) {
+            const moodBox = document.getElementById("mood-box");   // mood display box
+            moodBox.textContent = `Mood: ${mood}`;                 // Update mood display on top
+        });
+
+        // what happens when we click the send button
+
+        document.getElementById('send-btn').onclick = function() {      //  So First it Find send-btn by elemmentid  and when the user click the button  it run this function 
+            const input = document.getElementById('message');            // it find the Message input box and stores it in Varable ("INPUT")  so that if user write some text we can access it using input.value
+            const msg = input.value;                                     // This Stores the Actual text in the variable msg
+            if (msg.trim() !== "") {                                      // And this line trim the space of the text and check whether the  message are not  empty text 
+                socket.send(msg);                                        // This send meg to the server 
+                input.value = "";                                        // This line clear the input Box 
+            }
+        }
+    </script>
+</body>
+</html>
