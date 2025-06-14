@@ -11,6 +11,8 @@ import os
 app = Flask(__name__)   
 app.config["SECRET_KEY"] = "secretekey"            # Used to secure the session       WE can write anything i have written(secretekey)                   
 socketio = SocketIO(app)
+# Tell NLTK where to look for the downloaded data
+nltk.data.path.append("/opt/render/nltk_data")
 sia = SentimentIntensityAnalyzer()                 # We are creating an object sia and assign SentimentIntensityAnalyzer() to it 
 
 # MongoDB Atlas connection (replace <password> with your actual MongoDB user password)
