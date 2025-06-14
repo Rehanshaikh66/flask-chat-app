@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: flask-chat-app
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python nltk_downloader.py
+    startCommand: python app.py
+    envVars:
+      - key: NLTK_DATA
+        value: /opt/render/nltk_data
