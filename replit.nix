@@ -7,7 +7,7 @@
     pkgs.python3Packages."python-dotenv"
     pkgs.python3Packages."pymongo"
     pkgs.python3Packages."nltk"
-    pkgs.regex
+    pkgs.python3Packages.regex
   ];
 }
 
