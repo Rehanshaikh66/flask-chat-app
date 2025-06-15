@@ -7,7 +7,8 @@
     pkgs.python3Packages."python-dotenv"
     pkgs.python3Packages."pymongo"
     pkgs.python3Packages."nltk"
-    pkgs.python3Packages.regex
+    pkgs.python3Packages."setuptools"
+    pkgs.python3Packages."wheel"
   ];
 }
 
