@@ -11,8 +11,7 @@ import os
 app = Flask(__name__)   
 app.config["SECRET_KEY"] = "secretekey"            # Used to secure the session       WE can write anything i have written(secretekey)                   
 socketio = SocketIO(app)
-# Tell NLTK where to look for the downloaded data
-nltk.data.path.append("/opt/render/nltk_data")
+nltk.download('vader_lexicon')
 sia = SentimentIntensityAnalyzer()                 # We are creating an object sia and assign SentimentIntensityAnalyzer() to it 
 
 # MongoDB Atlas connection (replace <password> with your actual MongoDB user password)
@@ -70,7 +69,9 @@ def handel_message(msg):                           # passing parameter (msg) to 
     send(f"{message_with_mood}", broadcast=True)
     
 if (__name__) ==  '__main__':
-    socketio.run(app, debug= True)                 # So here we are RInnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online 
+    socketio.run(app, host='0.0.0.0', port=3000, debug=True)
+
+    # socketio.run(app, debug= True)                 # So here we are RInnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online 
 
 
 
