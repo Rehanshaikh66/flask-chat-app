@@ -28,13 +28,19 @@ def char():
 
 @socketio.on("message")                            # adding  Listner function and giving event name as (message)
 
-def handel_message(msg):                           # passing parameter (msg) to function
-    print(f"User Message :  {msg}")                # Print message on server
+def handel_message(data):                           # passing parameter (msg) to function
+    name = data.get("name", "User")
+    msg = data.get("message", "")
+
+    print(f"{name} Message :  {msg}")                # Print message on server
+
+
 
 
 # Use VADER Which is a part Nltk Liabrary to analyze the sentiment of the message
 # Save message to MongoDB with timestamp
     collection.insert_one({
+        "name": name,
         "text": msg,
         "timestamp": datetime.utcnow()              # Save time so we can later fetch "latest" messages
     })
@@ -60,13 +66,13 @@ def handel_message(msg):                           # passing parameter (msg) to 
         mood = "🙂 Neutral sentiment so far"                        # Or else scores are considered neutral
 
     # Add mood to message
-    message_with_mood =f"User: {msg}"                         # Using f String 
+    message_with_mood =f"{name}: {msg}"                         # Using f String 
     # send(message_with_mood, broadcast = True)                 # Using Send function from socket.oi  to send the msg to all connected client and itself too cuz we are braodcasting it 
 
     # Send mood separately
     socketio.emit("mood_update", mood)
 
-    send(f"{message_with_mood}", broadcast=True)
+    send({"name": name, "message": msg}, broadcast=True)
     
 if (__name__) ==  '__main__':
     port = int(os.environ.get("PORT", 5000))
