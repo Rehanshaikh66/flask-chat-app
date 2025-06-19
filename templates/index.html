@@ -13,6 +13,8 @@
 </head>
 <body>
     <h2>Real-time Chat</h2>
+    <input type=" text" id="name" placeholder="Enter your name..."/>
+    <br><br>
     <div id="mood-box">🙂 Mood: Neutral</div> <!--NEW mood display section -->
     <div id="chat-box"></div>
     <input type="text" id="message" placeholder="Type your message..." />
@@ -24,8 +26,8 @@
         // Creationg a Listner Function 
         socket.on('message' , function(msg) {                      // Giving Event Name "message" and data as Function(msg)
             const Box = document.getElementById("chat-box");       // Finding ('Chat box') by id and stroing it in tp variable Box    --------------  so that we can add new meaasges in the Box 
-            const [mood, userMsg] = msg.split("\n");               // Split the incoming message into mood and actual message  Split at \n
-            Box.innerHTML += `<div>${msg}</div>`;                  // innnerHTML means Inside the chat box   So basically this line add new meaage in side the chat box  and writing the (msg) between <div> so it appears on New Line 
+            // const [mood, userMsg] = msg.split("\n");               // Split the incoming message into mood and actual message  Split at \n
+            Box.innerHTML += `<div>${msg.name}: ${msg.message}</div>`;     // innnerHTML means Inside the chat box   So basically this line add new meaage in side the chat box  and writing the (msg) between <div> so it appears on New Line 
             Box.scrollTop = Box.scrollHeight;                      // scrollTop shows how far down the box is scrolled and scrollHeight shows total height of the messages  bascaaly this line Automatically scroll the chat box to the bottom, so the latest message is visible.
         });
          // Handle mood update separately
@@ -37,12 +39,21 @@
 
         // what happens when we click the send button
 
-        document.getElementById('send-btn').onclick = function() {      //  So First it Find send-btn by elemmentid  and when the user click the button  it run this function 
-            const input = document.getElementById('message');            // it find the Message input box and stores it in Varable ("INPUT")  so that if user write some text we can access it using input.value
-            const msg = input.value;                                     // This Stores the Actual text in the variable msg
-            if (msg.trim() !== "") {                                      // And this line trim the space of the text and check whether the  message are not  empty text 
-                socket.send(msg);                                        // This send meg to the server 
-                input.value = "";                                        // This line clear the input Box 
+        document.getElementById('send-btn').onclick = function() {      //  So First it Find send-btn by elemmentid  and when the user click the button  it run this function
+            const name_input = document.getElementById('name')
+            const msg_input = document.getElementById('message');            // it find the Message input box and stores it in Varable ("INPUT")  so that if user write some text we can access it using input.value
+
+            const name = name_input.value.trim()
+            const msg = msg_input.value.trim();                                     // This Stores the Actual text in the variable msg
+
+            if (name === ""){
+                alert("Please enter your name before sending a message.")
+                return;
+            }
+
+            if (msg !== "") {                                      // And this line trim the space of the text and check whether the  message are not  empty text 
+                socket.emit('message', { name: name, message: msg});                                        // This send meg to the server 
+                msg_input.value = "";                                        // This line clear the input Box 
             }
         }
     </script>
