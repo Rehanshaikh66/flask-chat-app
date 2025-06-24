@@ -45,6 +45,10 @@ def handel_message(data):                           # passing parameter (msg) to
         "timestamp": datetime.utcnow()              # Save time so we can later fetch "latest" messages
     })
 
+    send({"name": name, "message": msg}, broadcast=True)
+
+@socketio.on("end_chat")
+def handel_end_chat():
     # Get the last 10–15 messages (most recent first, then reverse)
     recent_messages = list(collection.find().sort("timestamp", -1).limit(15))
     recent_messages.reverse()                       # Reverse the messages so we go from oldest → latest
@@ -66,14 +70,13 @@ def handel_message(data):                           # passing parameter (msg) to
         mood = "🙂 Neutral sentiment so far"                        # Or else scores are considered neutral
 
     # Add mood to message
-    message_with_mood =f"{name}: {msg}"                         # Using f String 
+    # message_with_mood =f"{name}: {msg}"                         # Using f String 
     # send(message_with_mood, broadcast = True)                 # Using Send function from socket.oi  to send the msg to all connected client and itself too cuz we are braodcasting it 
 
     # Send mood separately
     socketio.emit("mood_update", mood)
 
-    send({"name": name, "message": msg}, broadcast=True)
-    
+# So here we are Runnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online     
 if (__name__) ==  '__main__':
     port = int(os.environ.get("PORT", 5000))
     socketio.run(app, host='0.0.0.0', port=port)
