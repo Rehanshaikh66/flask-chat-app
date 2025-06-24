@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login to Chat</title>
+</head>
+<body>
+    <h2>Enter your name to join the chat</h2>
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Enter your name..." required />
+        <button type="submit">Join Chat</button>
+    </form>
+
+    <script>
+        document.getElementById("login-form").onsubmit = function(e) {
+            e.preventDefault(); // prevent reload
+            const name = document.getElementById("username").value.trim();
+            if (name !== "") {
+                localStorage.setItem("chat_username", name);  // save to browser
+                window.location.href = "/chat";               // redirect to chat
+            } else {
+                alert("Please enter your name");
+            }
+        };
+    </script>
+</body>
+</html>

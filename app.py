@@ -23,6 +23,10 @@ collection = db["messages"]
 
 
 @app.route('/')
+def login():
+    return render_template('login.html')  # Show login page first
+
+@app.route('/chat')
 def char():
     return render_template('index.html')           # to Fetch the html code and display on the server 
 

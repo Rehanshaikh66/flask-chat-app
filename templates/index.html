@@ -8,12 +8,12 @@
         #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }  
         #message { width: 70%; padding: 5px; }
         #send-btn { padding: 5px 10px; }
+        #end-chat-btn { padding: 5px 10px; }
         #mood-box {display: none; margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #444; }
     </style>
 </head>
 <body>
     <h2>Real-time Chat</h2>
-    <input type=" text" id="name" placeholder="Enter your name..."/>
     <br><br>
     <div id="mood-box">🙂 Mood: Neutral</div> <!--NEW mood display section -->
     <div id="chat-box"></div>
@@ -23,6 +23,8 @@
 
     <script>
         const socket = io();      // Establishing Connection to the server  using Sockete.io
+        // ✅ Get name from browser's localStorage (saved from login.html)
+        const name = localStorage.getItem("chat_username") || "Anonymous";
 
         // Creationg a Listner Function 
         socket.on('message' , function(msg) {                      // Giving Event Name "message" and data as Function(msg)
@@ -42,16 +44,8 @@
         // what happens when we click the send button
 
         document.getElementById('send-btn').onclick = function() {      //  So First it Find send-btn by elemmentid  and when the user click the button  it run this function
-            const name_input = document.getElementById('name')
             const msg_input = document.getElementById('message');            // it find the Message input box and stores it in Varable ("INPUT")  so that if user write some text we can access it using input.value
-
-            const name = name_input.value.trim()
             const msg = msg_input.value.trim();                                     // This Stores the Actual text in the variable msg
-
-            if (name === ""){
-                alert("Please enter your name before sending a message.")
-                return;
-            }
 
             if (msg !== "") {                                      // And this line trim the space of the text and check whether the  message are not  empty text 
                 socket.emit('message', { name: name, message: msg});                                        // This send meg to the server 
