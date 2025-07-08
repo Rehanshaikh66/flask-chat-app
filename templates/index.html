@@ -8,7 +8,7 @@
         #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }  
         #message { width: 70%; padding: 5px; }
         #send-btn { padding: 5px 10px; }
-        #end-chat-btn { padding: 5px 10px; }
+        #sentiment-icon { cursor:pointer;font-size: 24px;margin-left: 10px;}
         #mood-box {display: none; margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #444; }
     </style>
 </head>
@@ -19,7 +19,7 @@
     <div id="chat-box"></div>
     <input type="text" id="message" placeholder="Type your message..." />
     <button id="send-btn">Send</button>
-    <button id="end-chat-btn">End Chat</button>
+    <span id="sentiment-icon" title="Show sentiment">📊</span>
 
     <script>
         const socket = io();      // Establishing Connection to the server  using Sockete.io
@@ -54,7 +54,7 @@
         }
         // When End Chat button is clicked
 
-        document.getElementById("end-chat-btn").onclick = function () {
+        document.getElementById("sentiment-icon").onclick = function () {
             socket.emit("end_chat");                                 // Tell the backend to compute sentiment
         }
     </script>
