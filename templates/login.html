@@ -5,20 +5,28 @@
 </head>
 <body>
     <h2>Enter your name to join the chat</h2>
-    <form id="login-form">
-        <input type="text" id="username" placeholder="Enter your name..." required />
-        <button type="submit">Join Chat</button>
+    <form id="login-form">                                                             <!-- The form for the login -->
+        <input type="text" id="username" placeholder="Enter your name..." required />  <!-- Text box to type your name -->
+        <input type="text" id="room" placeholder="Enter room id..." required />        <!-- Text box to type the room id --> 
+        <button type="submit">Join Chat</button>                                       <!-- Button to submit the form -->
     </form>
 
     <script>
+         // When the form is submitted
         document.getElementById("login-form").onsubmit = function(e) {
-            e.preventDefault(); // prevent reload
+            e.preventDefault();                                               // Stop the form from reloading the page
+
+            // Get the value of name and room
             const name = document.getElementById("username").value.trim();
-            if (name !== "") {
-                localStorage.setItem("chat_username", name);  // save to browser
-                window.location.href = "/chat";               // redirect to chat
+            const room = document.getElementById("room").value.trim();
+
+            // Check if both fields are filled
+            if (name !== "" && room !== "") {
+                localStorage.setItem("chat_username", name);    // Save the name in browser's localStorage
+                localStorage.setItem("chat_room", room);       // Save the room id in browser's localStorage
+                window.location.href = "/chat";               // redirect to chat page
             } else {
-                alert("Please enter your name");
+                alert("Please enter your name and room id"); // Show an alert if any field is empty
             }
         };
     </script>

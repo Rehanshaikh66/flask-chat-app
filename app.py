@@ -1,5 +1,5 @@
 from flask import Flask, render_template           # importing render template cuz it will help too display out HTML file 
-from flask_socketio import SocketIO, send          # impoting send function  so that whavtever text im writing must be visiable to the other client
+from flask_socketio import SocketIO, send , join_room, leave_room , emit        # impoting send function  so that whavtever text im writing must be visiable to the other client
 from pymongo import MongoClient                    # to connect and interact with MongoDB Atlas
 from nltk.sentiment import SentimentIntensityAnalyzer  # sentiment analysis using VADER
 import nltk
@@ -30,13 +30,23 @@ def login():
 def char():
     return render_template('index.html')           # to Fetch the html code and display on the server 
 
+@socketio.on("join_room")               # Handle a user joining a room
+
+def handel_join(data):
+    name = data["name"]
+    room = data["room"]
+    join_room(room)                                  # add this socket to the room
+    print(f"{name} has Joined the room {room}")
+    emit("message",{"name": "System", "message": f"{name} has joined the room."}, room = room)      # Notify everyone in the room
+
 @socketio.on("message")                            # adding  Listner function and giving event name as (message)
 
 def handel_message(data):                           # passing parameter (msg) to function
     name = data.get("name", "User")
+    room = data.get("room","general")
     msg = data.get("message", "")
 
-    print(f"{name} Message :  {msg}")                # Print message on server
+    print(f"{name} Message in {room}:  {msg}")                # Print message on server
 
 
 
@@ -46,10 +56,11 @@ def handel_message(data):                           # passing parameter (msg) to
     collection.insert_one({
         "name": name,
         "text": msg,
+        "room": room,
         "timestamp": datetime.utcnow()              # Save time so we can later fetch "latest" messages
     })
 
-    send({"name": name, "message": msg}, broadcast=True)
+    emit("message", {"name": name, "message": msg}, room = room)   # Send the message to everyone in the same room
 
 @socketio.on("end_chat")
 def handel_end_chat():

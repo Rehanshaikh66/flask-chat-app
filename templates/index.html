@@ -23,8 +23,14 @@
 
     <script>
         const socket = io();      // Establishing Connection to the server  using Sockete.io
-        // ✅ Get name from browser's localStorage (saved from login.html)
+
+        // Get name from browser's localStorage (saved from login.html)
         const name = localStorage.getItem("chat_username") || "Anonymous";
+
+        // Get the room name from localStorage (saved during login page)
+        const room = localStorage.getItem("chat_room") || "general";
+
+        socket.emit("join_room",{name: name, room: room }); // Tells the server: "I am joining this room!"
 
         // Creationg a Listner Function 
         socket.on('message' , function(msg) {                      // Giving Event Name "message" and data as Function(msg)
@@ -48,7 +54,7 @@
             const msg = msg_input.value.trim();                                     // This Stores the Actual text in the variable msg
 
             if (msg !== "") {                                      // And this line trim the space of the text and check whether the  message are not  empty text 
-                socket.emit('message', { name: name, message: msg});                                        // This send meg to the server 
+                socket.emit('message', { name: name,room: room, message: msg });                                        // This send meg to the server,  including your name and room
                 msg_input.value = "";                                        // This line clear the input Box 
             }
         }
