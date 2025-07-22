@@ -1,4 +1,4 @@
-from flask import Flask, render_template           # importing render template cuz it will help too display out HTML file 
+from flask import Flask, render_template , request           # importing render template cuz it will help too display out HTML file , Importing request to access user's session ID (SID) 
 from flask_socketio import SocketIO, send , join_room, leave_room , emit        # impoting send function  so that whavtever text im writing must be visiable to the other client
 from pymongo import MongoClient                    # to connect and interact with MongoDB Atlas
 from nltk.sentiment import SentimentIntensityAnalyzer  # sentiment analysis using VADER
@@ -89,7 +89,7 @@ def handel_end_chat():
     # send(message_with_mood, broadcast = True)                 # Using Send function from socket.oi  to send the msg to all connected client and itself too cuz we are braodcasting it 
 
     # Send mood separately
-    socketio.emit("mood_update", mood)
+    socketio.emit("mood_update", mood, to=request.sid)        # request.sid = unique session ID of the connected user who sent the request  ensures that only that one user gets the mood result.
 
 # So here we are Runnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online     
 if (__name__) ==  '__main__':
@@ -103,89 +103,6 @@ if (__name__) ==  '__main__':
     # socketio.run(app, host='0.0.0.0', port=3000, debug=True)
 
     # socketio.run(app, debug= True)                 # So here we are RInnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
