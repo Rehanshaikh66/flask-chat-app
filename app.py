@@ -5,7 +5,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer  # sentiment analysis usin
 import nltk
 from datetime import datetime                      # to store message timestamps
 from dotenv import load_dotenv
-from transformers import Pipeline
+from transformers import pipeline
 import os
 
 
@@ -22,8 +22,8 @@ client = MongoClient(uri)
 db = client["chat_db"]
 collection = db["messages"]
 
-sarcasm_detector = Pipeline("text-classification", model="mrm8488/t5-base-finetuned-sarcasm-twitter")
-zero_shot = Pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
+sarcasm_detector = pipeline("text-classification", model="mrm8488/t5-base-finetuned-sarcasm-twitter")
+zero_shot = pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
 
 def detect_sarcasm(text):
     result = sarcasm_detector(text)
