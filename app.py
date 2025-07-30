@@ -22,7 +22,7 @@ client = MongoClient(uri)
 db = client["chat_db"]
 collection = db["messages"]
 
-sarcasm_detector = pipeline("text-classification", model="mrm8488/t5-base-finetuned-sarcasm-twitter")
+sarcasm_detector = pipeline("text-classification", model="SkolkovoInstitute/sarcasm-detector")
 zero_shot = pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
 
 def detect_sarcasm(text):
