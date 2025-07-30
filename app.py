@@ -5,6 +5,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer  # sentiment analysis usin
 import nltk
 from datetime import datetime                      # to store message timestamps
 from dotenv import load_dotenv
+from transformers import Pipeline
 import os
 
 
@@ -21,6 +22,17 @@ client = MongoClient(uri)
 db = client["chat_db"]
 collection = db["messages"]
 
+sarcasm_detector = Pipeline("text-classification", model="mrm8488/t5-base-finetuned-sarcasm-twitter")
+zero_shot = Pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
+
+def detect_sarcasm(text):
+    result = sarcasm_detector(text)
+    return result[0]['label']
+
+def detect_topic(text):
+    labels = ["death", "politics", "casual", "off-topic", "joke", "angry"]
+    result = zero_shot(text, candidate_labels=labels)
+    return result['labels'][0]
 
 @app.route('/')
 def login():
@@ -70,7 +82,11 @@ def handel_end_chat():
 
     # Analyze sentiment scores for each message and compute average
     total_score = 0
+    full_text = ""
+    
     for item in recent_messages:                    # Loop over each message
+        text = item['text']
+        full_text += text + " "
         total_score += sia.polarity_scores(item['text'])['compound']      # Get compound sentiment score and add it
 
     avg_score = total_score / len(recent_messages) if recent_messages else 0       # Calculate the average sentiment score of the 15 messages
@@ -88,8 +104,12 @@ def handel_end_chat():
     # message_with_mood =f"{name}: {msg}"                         # Using f String 
     # send(message_with_mood, broadcast = True)                 # Using Send function from socket.oi  to send the msg to all connected client and itself too cuz we are braodcasting it 
 
+    detected_sarcasm = detect_sarcasm(full_text)
+    detected_topic = detect_topic(full_text)
+
+    Final_mood = f"{mood} — Tone: {detected_sarcasm}, Topic: {detected_topic}"
     # Send mood separately
-    socketio.emit("mood_update", mood, to=request.sid)        # request.sid = unique session ID of the connected user who sent the request  ensures that only that one user gets the mood result.
+    socketio.emit("mood_update", Final_mood, to=request.sid)        # request.sid = unique session ID of the connected user who sent the request  ensures that only that one user gets the mood result.
 
 # So here we are Runnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online     
 if (__name__) ==  '__main__':
