@@ -5,7 +5,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer  # sentiment analysis usin
 import nltk
 from datetime import datetime                      # to store message timestamps
 from dotenv import load_dotenv
-from transformers import pipeline
+import requests
 import os
 
 
@@ -22,17 +22,38 @@ client = MongoClient(uri)
 db = client["chat_db"]
 collection = db["messages"]
 
-sarcasm_detector = pipeline("text-classification", model="mrm8488/t5-base-finetuned-sarcasm-twitter")
-zero_shot = pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
-
 def detect_sarcasm(text):
-    result = sarcasm_detector(text)
-    return result[0]['label']
+    HF_TOKEN = os.getenv("HF_TOKEN")
+    API_URL = "https://api-inference.huggingface.co/models/SkolkovoInstitute/sarcasm-detector"
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+
+    response = requests.post(API_URL, headers=headers, json={"inputs": text})
+    try:
+        result = response.json()
+        if isinstance(result, list) and result:
+            label = result[0]['label']
+            score = result[0]['score']
+            return f"{label} ({score:.2f})"
+        return "Unknown"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 def detect_topic(text):
-    labels = ["death", "politics", "casual", "off-topic", "joke", "angry"]
-    result = zero_shot(text, candidate_labels=labels)
-    return result['labels'][0]
+    HF_TOKEN = os.getenv("HF_TOKEN")
+    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+
+    candidate_labels = ["off-topic", "death", "politics", "casual", "joke", "angry", "sports", "technology"]
+    payload = {"inputs": text, "parameters": {"candidate_labels": candidate_labels}}
+
+    response = requests.post(API_URL, headers=headers, json=payload)
+    try:
+        result = response.json()
+        if "labels" in result and result["labels"]:
+            return result["labels"][0]
+        return "Unknown"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @app.route('/')
 def login():
@@ -107,9 +128,10 @@ def handel_end_chat():
     detected_sarcasm = detect_sarcasm(full_text)
     detected_topic = detect_topic(full_text)
 
-    Final_mood = f"{mood} — Tone: {detected_sarcasm}, Topic: {detected_topic}"
+    final_mood = f"{mood} — With Tone of : {detected_sarcasm}, On Topic: {detected_topic}"
+
     # Send mood separately
-    socketio.emit("mood_update", Final_mood, to=request.sid)        # request.sid = unique session ID of the connected user who sent the request  ensures that only that one user gets the mood result.
+    socketio.emit("mood_update", final_mood, to=request.sid)        # request.sid = unique session ID of the connected user who sent the request  ensures that only that one user gets the mood result.
 
 # So here we are Runnig Our app through Socketio and not Flask and we have Kept Degub = True so that it will show any error online     
 if (__name__) ==  '__main__':
