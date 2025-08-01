@@ -7,7 +7,8 @@ from datetime import datetime                      # to store message timestamps
 from dotenv import load_dotenv
 import requests
 import os
-
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")
 
 app = Flask(__name__)   
 app.config["SECRET_KEY"] = "secretekey"            # Used to secure the session       WE can write anything i have written(secretekey)                   
