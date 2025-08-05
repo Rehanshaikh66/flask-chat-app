@@ -26,19 +26,18 @@ collection = db["messages"]
 
 def detect_sarcasm(text):
     HF_TOKEN = os.getenv("HF_TOKEN")
-    API_URL = "https://api-inference.huggingface.co/models/SkolkovoInstitute/sarcasm-detector"
+    API_URL = "https://api-inference.huggingface.co/models/helinivan/english-sarcasm-detector"
     headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
     response = requests.post(API_URL, headers=headers, json={"inputs": text})
     try:
-        result = response.json()
-        if isinstance(result, list) and result:
-            label = result[0]['label']
-            score = result[0]['score']
-            return f"{label} ({score:.2f})"
-        return "Unknown"
+        result = response.json()[0]
+        label = result['label']
+        score = result['score']
+        sarcasm = "Sarcastic" if label == "LABEL_1" else "Not Sarcastic"
+        return f"{sarcasm} ({score:.2f})"
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error in sarcasm detection: {str(e)}"
 
 def detect_topic(text):
     HF_TOKEN = os.getenv("HF_TOKEN")
