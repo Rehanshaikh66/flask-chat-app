@@ -26,19 +26,29 @@ collection = db["messages"]
 
 def detect_sarcasm(text):
     HF_TOKEN = os.getenv("HF_TOKEN")
-    API_URL = "https://api-inference.huggingface.co/models/helinivan/english-sarcasm-detector"
-    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    API_URL =  "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
+    headers = {"Authorization": f"Bearer {HF_TOKEN}",
+                "Content-Type": "application/json"}
+    
+    candidate_labels = ["sarcastic", "not sarcastic"]
+    payload = {
+        "inputs": text,
+        "parameters": {"candidate_labels": candidate_labels}
+    }
 
-    response = requests.post(API_URL, headers=headers, json={"inputs": text})
     try:
-        result = response.json()[0]
-        label = result['label']
-        score = result['score']
-        sarcasm = "Sarcastic" if label == "LABEL_1" else "Not Sarcastic"
-        return f"{sarcasm} ({score:.2f})"
+        response = requests.post(API_URL, headers=headers, json=payload)
+        result = response.json()
+        if "labels" in result:
+            label = result["labels"][0]
+            score = result["scores"][0]
+            return f"{label.capitalize()} (confidence: {score:.2f})"
+        else:
+            return "Unknown"
+
     except Exception as e:
         return f"Error in sarcasm detection: {str(e)}"
-
+    
 def detect_topic(text):
     HF_TOKEN = os.getenv("HF_TOKEN")
     API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
